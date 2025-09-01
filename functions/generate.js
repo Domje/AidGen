@@ -42,8 +42,10 @@ async function handlePost(context) {
       `- All values must fall within specified ranges.\n` +
       `- Be precise & realistic for the Fellow Aiden brewer.\n` +
       `- Do not output text outside of tables.`;
+    // Use the latest GPT‑5 model if available. This model may require
+    // appropriate access in your OpenAI account. See documentation for details.
     const payload = {
-      model: 'gpt-3.5-turbo',
+      model: 'gpt-5',
       messages: [
         { role: 'system', content: systemPrompt },
         { role: 'user', content: userMessage },
