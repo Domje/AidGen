@@ -11,7 +11,7 @@
       <h1 class="title">AidGen</h1>
     </header>
     <main>
-      <section class="card">
+      <section id="form-section" class="card">
         <form id="brew-form" class="form">
           <div class="grid">
             <div class="form-group">
@@ -137,7 +137,10 @@
           </div>
         </form>
       </section>
-      <section id="result-container" class="card hidden">
+      <section id="recipe-section" class="card hidden">
+        <div class="button-container" style="justify-content: flex-start; margin-bottom: 1rem;">
+          <button id="another-btn" class="btn secondary">ANOTHER RECIPE</button>
+        </div>
         <h2 class="section-title">Generated Recipe</h2>
         <div id="result-output" class="result"></div>
         <div class="button-container">
@@ -154,10 +157,11 @@
         event.preventDefault();
         const submitBtn = document.getElementById('submit-btn');
         const loadingEl = document.getElementById('loading');
-        const resultContainer = document.getElementById('result-container');
+        const recipeSection = document.getElementById('recipe-section');
+        const formSection = document.getElementById('form-section');
         const resultOutput = document.getElementById('result-output');
         const copyBtn = document.getElementById('copy-btn');
-        resultContainer.classList.add('hidden');
+        recipeSection.classList.add('hidden');
         loadingEl.classList.remove('hidden');
         submitBtn.disabled = true;
         const form = document.getElementById('brew-form');
@@ -179,7 +183,9 @@
           }
           const data = await response.json();
           resultOutput.innerHTML = data.html || '<p>No recipe returned.</p>';
-          resultContainer.classList.remove('hidden');
+          // Hide form, show recipe section
+          formSection.classList.add('hidden');
+          recipeSection.classList.remove('hidden');
           copyBtn.onclick = () => {
             const temp = document.createElement('textarea');
             temp.value = resultOutput.innerText;
@@ -192,13 +198,30 @@
           };
         } catch (err) {
           resultOutput.innerHTML = `<p class="error">Error: ${err.message}</p>`;
-          resultContainer.classList.remove('hidden');
+          formSection.classList.add('hidden');
+          recipeSection.classList.remove('hidden');
         } finally {
           loadingEl.classList.add('hidden');
           submitBtn.disabled = false;
         }
       }
       document.getElementById('brew-form').addEventListener('submit', generateRecipe);
+
+      // Allow user to generate another recipe by returning to the form view
+      const anotherBtn = document.getElementById('another-btn');
+      anotherBtn.addEventListener('click', () => {
+        const recipeSection = document.getElementById('recipe-section');
+        const formSection = document.getElementById('form-section');
+        const resultOutput = document.getElementById('result-output');
+        // Clear previous results
+        resultOutput.innerHTML = '';
+        // Reset copy button text
+        const copyBtn = document.getElementById('copy-btn');
+        copyBtn.textContent = 'Copy to clipboard';
+        // Show form and hide recipe view
+        formSection.classList.remove('hidden');
+        recipeSection.classList.add('hidden');
+      });
     </script>
   </body>
-</html=
+</html>
