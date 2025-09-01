@@ -80,9 +80,7 @@ async function handlePost(context) {
   }
 }
 
-// Expose both a generic handler and a POST-specific handler. The generic handler
-// delegates to the POST handler if the request method is POST; otherwise it
-// responds with a 405 status.
+// Generic handler for Pages Functions. Delegates to POST handler or returns 405.
 export async function onRequest(context) {
   if (context.request.method === 'POST') {
     return handlePost(context);
