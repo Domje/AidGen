@@ -45,7 +45,7 @@ async function handlePost(context) {
     // Use the latest GPT‑5 model if available. This model may require
     // appropriate access in your OpenAI account. See documentation for details.
     const payload = {
-      model: 'gpt-5',
+      model: 'gpt-3.5-turbo',
       messages: [
         { role: 'system', content: systemPrompt },
         { role: 'user', content: userMessage },
