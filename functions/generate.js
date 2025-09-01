@@ -51,15 +51,14 @@ export async function onRequestPost(context) {
       temperature: 0.5,
       max_tokens: 800,
     };
-    const payload = {
-  model: 'gpt-5',        // or 'gpt-5-mini' / 'gpt-5-nano'
-  messages: [
-    { role: 'system', content: systemPrompt },
-    { role: 'user',   content: userMessage }
-  ],
-  temperature: 0.5,
-  max_tokens: 800
-};
+    const openaiRes = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${env.OPENAI_API_KEY}`,
+      },
+      body: JSON.stringify(payload),
+    });
     if (!openaiRes.ok) {
       const errorText = await openaiRes.text();
       return new Response(
