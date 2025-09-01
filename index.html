@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AidGen</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <header>
+      <h1 class="title">AidGen</h1>
+    </header>
+    <main>
+      <section class="card">
+        <form id="brew-form" class="form">
+          <div class="grid">
+            <div class="form-group">
+              <label for="name">Name</label>
+              <input id="name" name="name" type="text" placeholder="Enter coffee name" />
+            </div>
+            <div class="form-group">
+              <label for="roast">Roast profile</label>
+              <select id="roast" name="roast">
+                <option value="" disabled selected>Select roast profile</option>
+                <option>light</option>
+                <option>light/medium</option>
+                <option>medium</option>
+                <option>medium/dark</option>
+                <option>dark</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="origin">Origin</label>
+              <select id="origin" name="origin">
+                <option value="" disabled selected>Select origin</option>
+                <option>Colombia</option>
+                <option>Ethiopia</option>
+                <option>Kenya</option>
+                <option>Guatemala</option>
+                <option>Brazil</option>
+                <option>Honduras</option>
+                <option>Costa Rica</option>
+                <option>Panama</option>
+                <option>El Salvador</option>
+                <option>Rwanda</option>
+                <option>Burundi</option>
+                <option>Mexico</option>
+                <option>Peru</option>
+                <option>Tanzania</option>
+                <option>Papua New Guinea</option>
+                <option>Indonesia</option>
+                <option>Yemen</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="process">Processing method</label>
+              <select id="process" name="process">
+                <option value="" disabled selected>Select processing method</option>
+                <option>Washed</option>
+                <option>Natural</option>
+                <option>Honey</option>
+                <option>Anaerobic</option>
+                <option>Wet-Hulled</option>
+                <option>Double Anaerobic</option>
+                <option>Carbonic Maceration</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="varietal">Varietal</label>
+              <input id="varietal" name="varietal" type="text" placeholder="Enter varietal" />
+            </div>
+            <div class="form-group">
+              <label for="masl">MASL (optional)</label>
+              <input id="masl" name="masl" type="number" min="0" step="1" placeholder="e.g. 1200" />
+            </div>
+            <div class="form-group">
+              <label for="roastDate">Roast date</label>
+              <input id="roastDate" name="roastDate" type="date" />
+            </div>
+            <div class="form-group">
+              <label for="brewProfile">Brew profile</label>
+              <select id="brewProfile" name="brewProfile">
+                <option value="" disabled selected>Select brew profile</option>
+                <option>clarity first</option>
+                <option>body first</option>
+                <option>balanced</option>
+              </select>
+            </div>
+          </div>
+          <div class="button-container">
+            <button type="submit" id="submit-btn" class="btn">RECIPE ME</button>
+          </div>
+        </form>
+      </section>
+      <section id="result-container" class="card hidden">
+        <h2 class="section-title">Generated Recipe</h2>
+        <div id="result-output" class="result"></div>
+        <div class="button-container">
+          <button id="copy-btn" class="btn secondary">Copy to clipboard</button>
+        </div>
+      </section>
+      <section id="loading" class="loading hidden">
+        <div class="spinner"></div>
+        <p>Generating your recipe…</p>
+      </section>
+    </main>
+    <script>
+      async function generateRecipe(event) {
+        event.preventDefault();
+        const submitBtn = document.getElementById('submit-btn');
+        const loadingEl = document.getElementById('loading');
+        const resultContainer = document.getElementById('result-container');
+        const resultOutput = document.getElementById('result-output');
+        const copyBtn = document.getElementById('copy-btn');
+        resultContainer.classList.add('hidden');
+        loadingEl.classList.remove('hidden');
+        submitBtn.disabled = true;
+        const form = document.getElementById('brew-form');
+        const formData = new FormData(form);
+        const params = {};
+        for (const [key, value] of formData.entries()) {
+          if (value && !value.startsWith('Select')) {
+            params[key] = value;
+          }
+        }
+        try {
+          const response = await fetch('/api/generate', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(params),
+          });
+          if (!response.ok) {
+            throw new Error(`Server responded with ${response.status}`);
+          }
+          const data = await response.json();
+          resultOutput.innerHTML = data.html || '<p>No recipe returned.</p>';
+          resultContainer.classList.remove('hidden');
+          copyBtn.onclick = () => {
+            const temp = document.createElement('textarea');
+            temp.value = resultOutput.innerText;
+            document.body.appendChild(temp);
+            temp.select();
+            document.execCommand('copy');
+            document.body.removeChild(temp);
+            copyBtn.textContent = 'Copied!';
+            setTimeout(() => (copyBtn.textContent = 'Copy to clipboard'), 1500);
+          };
+        } catch (err) {
+          resultOutput.innerHTML = `<p class="error">Error: ${err.message}</p>`;
+          resultContainer.classList.remove('hidden');
+        } finally {
+          loadingEl.classList.add('hidden');
+          submitBtn.disabled = false;
+        }
+      }
+      document.getElementById('brew-form').addEventListener('submit', generateRecipe);
+    </script>
+  </body>
+</html>
