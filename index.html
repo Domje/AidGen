@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>AidGen</title>
+    <!-- Link to local stylesheet for dark mode styling -->
     <link rel="stylesheet" href="./styles.css" />
   </head>
   <body>
@@ -11,6 +12,7 @@
       <h1 class="title">AidGen</h1>
     </header>
     <main>
+      <!-- Form section: collects coffee details -->
       <section id="form-section" class="card">
         <form id="brew-form" class="form">
           <div class="grid">
@@ -137,8 +139,9 @@
           </div>
         </form>
       </section>
+      <!-- Recipe section: displays generated recipe and allows for another recipe generation -->
       <section id="recipe-section" class="card hidden">
-        <div class="button-container" style="justify-content: flex-start; margin-bottom: 1rem;">
+        <div class="button-container" style="justify-content:flex-start; margin-bottom:1rem;">
           <button id="another-btn" class="btn secondary">ANOTHER RECIPE</button>
         </div>
         <h2 class="section-title">Generated Recipe</h2>
@@ -147,10 +150,11 @@
           <button id="copy-btn" class="btn secondary">Copy to clipboard</button>
         </div>
       </section>
-      <section id="loading" class="loading" style="display:none;">
-  <div class="spinner"></div>
-  <p>Generating your recipe…</p>
-  </section>
+      <!-- Loading indicator: hidden by default, displayed while generating -->
+      <section id="loading" class="loading" style="display: none;">
+        <div class="spinner"></div>
+        <p>Generating your recipe…</p>
+      </section>
     </main>
     <script>
       async function generateRecipe(event) {
@@ -161,8 +165,8 @@
         const formSection = document.getElementById('form-section');
         const resultOutput = document.getElementById('result-output');
         const copyBtn = document.getElementById('copy-btn');
-        recipeSection.classList.add('hidden');
-        loadingEl.classList.remove('hidden');
+        // Show loading indicator and disable submit button
+        loadingEl.style.display = 'flex';
         submitBtn.disabled = true;
         const form = document.getElementById('brew-form');
         const formData = new FormData(form);
@@ -183,9 +187,10 @@
           }
           const data = await response.json();
           resultOutput.innerHTML = data.html || '<p>No recipe returned.</p>';
-          // Hide form, show recipe section
+          // Hide form and show recipe section
           formSection.classList.add('hidden');
           recipeSection.classList.remove('hidden');
+          // Setup copy to clipboard
           copyBtn.onclick = () => {
             const temp = document.createElement('textarea');
             temp.value = resultOutput.innerText;
@@ -201,13 +206,13 @@
           formSection.classList.add('hidden');
           recipeSection.classList.remove('hidden');
         } finally {
-          loadingEl.classList.add('hidden');
+          // Hide loading indicator and re-enable submit button
+          loadingEl.style.display = 'none';
           submitBtn.disabled = false;
         }
       }
       document.getElementById('brew-form').addEventListener('submit', generateRecipe);
-
-      // Allow user to generate another recipe by returning to the form view
+      // Handle generating another recipe
       const anotherBtn = document.getElementById('another-btn');
       anotherBtn.addEventListener('click', () => {
         const recipeSection = document.getElementById('recipe-section');
@@ -216,13 +221,12 @@
         // Clear previous results
         resultOutput.innerHTML = '';
         // Reset copy button text
-        const copyBtn = document.getElementById('copy-btn');
-        copyBtn.textContent = 'Copy to clipboard';
+        document.getElementById('copy-btn').textContent = 'Copy to clipboard';
         // Show form and hide recipe view
         formSection.classList.remove('hidden');
         recipeSection.classList.add('hidden');
         // Ensure loading spinner is hidden
-        document.getElementById('loading').classList.add('hidden');
+        document.getElementById('loading').style.display = 'none';
       });
     </script>
   </body>
