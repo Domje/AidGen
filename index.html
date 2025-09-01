@@ -1,0 +1,238 @@
+<!--
+  AidGen Web Application
+  Single page app that allows users to input coffee details and generate a Fellow Aiden recipe.
+  Styled with TailwindCSS and DaisyUI with dark mode enabled by default.
+  Created by an expert web developer.
+-->
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AidGen</title>
+    <!-- TailwindCSS & DaisyUI via CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- DaisyUI plugin for Tailwind -->
+    <script>
+      tailwind.config = {
+        darkMode: 'class',
+        plugins: [window.daisyui],
+        daisyui: {
+          themes: [
+            {
+              // Custom dark theme tuned for readability
+              aidgendark: {
+                ...daisyui.themes['dark'],
+                primary: '#4ade80',
+                'primary-focus': '#22c55e',
+                'primary-content': '#0f172a',
+                secondary: '#60a5fa',
+                accent: '#f87171',
+              },
+            },
+          ],
+        },
+      };
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/daisyui@4.7.3/dist/full.js"></script>
+  </head>
+  <body class="min-h-screen bg-base-100 flex flex-col items-center justify-start pt-10">
+    <!-- Branding Title -->
+    <h1 class="text-5xl font-bold mb-8 select-none">AidGen</h1>
+    <!-- Form Card -->
+    <div class="card w-full max-w-3xl bg-base-200 shadow-xl p-6">
+      <form id="brew-form" class="space-y-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <!-- Name -->
+          <div>
+            <label class="label" for="name"><span class="label-text">Name</span></label>
+            <input
+              id="name"
+              name="name"
+              type="text"
+              placeholder="Enter coffee name"
+              class="input input-bordered w-full"
+            />
+          </div>
+          <!-- Roast Profile -->
+          <div>
+            <label class="label" for="roast"><span class="label-text">Roast profile</span></label>
+            <select id="roast" name="roast" class="select select-bordered w-full">
+              <option value="" disabled selected>Select roast profile</option>
+              <option>light</option>
+              <option>light/medium</option>
+              <option>medium</option>
+              <option>medium/dark</option>
+              <option>dark</option>
+            </select>
+          </div>
+          <!-- Origin -->
+          <div>
+            <label class="label" for="origin"><span class="label-text">Origin</span></label>
+            <select id="origin" name="origin" class="select select-bordered w-full">
+              <option value="" disabled selected>Select origin</option>
+              <option>Colombia</option>
+              <option>Ethiopia</option>
+              <option>Kenya</option>
+              <option>Guatemala</option>
+              <option>Brazil</option>
+              <option>Honduras</option>
+              <option>Costa Rica</option>
+              <option>Panama</option>
+              <option>El Salvador</option>
+              <option>Rwanda</option>
+              <option>Burundi</option>
+              <option>Mexico</option>
+              <option>Peru</option>
+              <option>Tanzania</option>
+              <option>Papua New Guinea</option>
+              <option>Indonesia</option>
+              <option>Yemen</option>
+            </select>
+          </div>
+          <!-- Processing Method -->
+          <div>
+            <label class="label" for="process"><span class="label-text">Processing method</span></label>
+            <select id="process" name="process" class="select select-bordered w-full">
+              <option value="" disabled selected>Select processing method</option>
+              <option>Washed</option>
+              <option>Natural</option>
+              <option>Honey</option>
+              <option>Anaerobic</option>
+              <option>Wet-Hulled</option>
+              <option>Double Anaerobic</option>
+              <option>Carbonic Maceration</option>
+            </select>
+          </div>
+          <!-- Varietal -->
+          <div>
+            <label class="label" for="varietal"><span class="label-text">Varietal</span></label>
+            <input
+              id="varietal"
+              name="varietal"
+              type="text"
+              placeholder="Enter varietal"
+              class="input input-bordered w-full"
+            />
+          </div>
+          <!-- MASL -->
+          <div>
+            <label class="label" for="masl"><span class="label-text">MASL (optional)</span></label>
+            <input
+              id="masl"
+              name="masl"
+              type="number"
+              min="0"
+              step="1"
+              placeholder="e.g. 1200"
+              class="input input-bordered w-full"
+            />
+          </div>
+          <!-- Roast Date -->
+          <div>
+            <label class="label" for="roastDate"><span class="label-text">Roast date</span></label>
+            <input
+              id="roastDate"
+              name="roastDate"
+              type="date"
+              class="input input-bordered w-full"
+            />
+          </div>
+          <!-- Brew Profile -->
+          <div>
+            <label class="label" for="brewProfile"><span class="label-text">Brew profile</span></label>
+            <select id="brewProfile" name="brewProfile" class="select select-bordered w-full">
+              <option value="" disabled selected>Select brew profile</option>
+              <option>clarity first</option>
+              <option>body first</option>
+              <option>balanced</option>
+            </select>
+          </div>
+        </div>
+        <!-- Submit Button -->
+        <div class="flex justify-center mt-6">
+          <button
+            type="submit"
+            id="submit-btn"
+            class="btn btn-primary text-lg px-10"
+          >
+            RECIPE ME
+          </button>
+        </div>
+      </form>
+    </div>
+    <!-- Result Section -->
+    <div id="result-container" class="w-full max-w-3xl mt-8 hidden">
+      <div class="card bg-base-200 shadow-xl p-6" id="result-card">
+        <h2 class="text-2xl font-semibold mb-4">Generated Recipe</h2>
+        <div id="result-output" class="prose prose-invert max-w-none"></div>
+        <div class="flex justify-end mt-4">
+          <button id="copy-btn" class="btn btn-secondary">Copy to clipboard</button>
+        </div>
+      </div>
+    </div>
+    <!-- Loading Spinner (hidden by default) -->
+    <div id="loading" class="flex flex-col items-center justify-center mt-8 hidden">
+      <span class="loading loading-spinner loading-lg"></span>
+      <p class="mt-2">Generating your recipe…</p>
+    </div>
+    <!-- Frontend Script -->
+    <script type="module">
+      async function generateRecipe(event) {
+        event.preventDefault();
+        const submitBtn = document.getElementById('submit-btn');
+        const loadingEl = document.getElementById('loading');
+        const resultContainer = document.getElementById('result-container');
+        const resultOutput = document.getElementById('result-output');
+        const copyBtn = document.getElementById('copy-btn');
+        resultContainer.classList.add('hidden');
+        loadingEl.classList.remove('hidden');
+        submitBtn.disabled = true;
+        // Gather form data
+        const form = document.getElementById('brew-form');
+        const formData = new FormData(form);
+        // Build a simple object with non-empty values
+        const params = {};
+        for (const [key, value] of formData.entries()) {
+          if (value && value !== 'Select roast profile' && value !== 'Select origin' && value !== 'Select processing method' && value !== 'Select brew profile') {
+            params[key] = value;
+          }
+        }
+        try {
+          const response = await fetch('/api/generate', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(params),
+          });
+          if (!response.ok) {
+            throw new Error(`Server responded with ${response.status}`);
+          }
+          const data = await response.json();
+          // Insert HTML content
+          resultOutput.innerHTML = data.html || '<p>No recipe returned.</p>';
+          resultContainer.classList.remove('hidden');
+          // Copy to clipboard
+          copyBtn.onclick = () => {
+            const temp = document.createElement('textarea');
+            temp.value = resultOutput.innerText;
+            document.body.appendChild(temp);
+            temp.select();
+            document.execCommand('copy');
+            document.body.removeChild(temp);
+            copyBtn.textContent = 'Copied!';
+            setTimeout(() => (copyBtn.textContent = 'Copy to clipboard'), 1500);
+          };
+        } catch (err) {
+          resultOutput.innerHTML = `<p class="text-error">Error: ${err.message}</p>`;
+          resultContainer.classList.remove('hidden');
+        } finally {
+          loadingEl.classList.add('hidden');
+          submitBtn.disabled = false;
+        }
+      }
+      document.getElementById('brew-form').addEventListener('submit', generateRecipe);
+    </script>
+  </body>
+</html>
