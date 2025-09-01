@@ -7,7 +7,7 @@
  * and returns the resulting HTML tables for display on the client.
  */
 
-export async function onRequestPost(context) {
+async function handlePost(context) {
   const { request, env } = context;
   try {
     const body = await request.json();
@@ -78,4 +78,17 @@ export async function onRequestPost(context) {
       { status: 400, headers: { 'Content-Type': 'application/json' } },
     );
   }
+}
+
+// Expose both a generic handler and a POST-specific handler. The generic handler
+// delegates to the POST handler if the request method is POST; otherwise it
+// responds with a 405 status.
+export async function onRequest(context) {
+  if (context.request.method === 'POST') {
+    return handlePost(context);
+  }
+  return new Response(JSON.stringify({ error: 'Method Not Allowed' }), {
+    status: 405,
+    headers: { 'Content-Type': 'application/json' },
+  });
 }
